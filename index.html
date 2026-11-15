@@ -158,7 +158,7 @@
   // 更新のたびに build_gate.js が書き換える。
   // 同じファイル名のままだとブラウザが古いデータを使い続けるため、
   // この値をURLに付けて必ず取り直させる
-  var BUILD = '20260903073016';
+  var BUILD = '20261115105021';
 
   var form = document.getElementById('gate');
   var input = document.getElementById('pw');
@@ -227,12 +227,18 @@
   }
 
   function render(files) {
-    var videoUrl = URL.createObjectURL(files['mp4.mp4']);
     var frame = document.getElementById('frame');
 
     return Promise.all([files['index.html'].text(), files['sitemap.html'].text()])
       .then(function (texts) {
-        var lpHtml = texts[0].split('"mp4.mp4"').join('"' + videoUrl + '"');
+        var lpHtml = texts[0];
+
+        // 動画を同梱しているLPのときだけ、復号したデータを指すURLに差し替える
+        if (files['mp4.mp4']) {
+          var videoUrl = URL.createObjectURL(files['mp4.mp4']);
+          lpHtml = lpHtml.split('"mp4.mp4"').join('"' + videoUrl + '"');
+        }
+
         var type = { type: 'text/html;charset=utf-8' };
         var lpUrl = URL.createObjectURL(new Blob([lpHtml], type));
         var mapUrl = URL.createObjectURL(new Blob([texts[1]], type));
